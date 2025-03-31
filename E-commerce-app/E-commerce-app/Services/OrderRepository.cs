@@ -17,14 +17,14 @@ namespace E_commerce_app.Services
 
         }
 
-        public async Task<Order> GetOrdersById(int id)
+        public async Task<RetrieveOrderDto> GetOrdersById(int id)
         {
             var orders = await _dbContext.Orders.Where(x => x.Id == id).Include(x => x.Customer)
                  .Include(x => x.OrderProducts).ThenInclude(c => c.Product).FirstOrDefaultAsync();
-            return orders;
+            return orders.MappingOrderDto();
         }
 
-        public async Task<Order> handleWithOrderDetails(OrderDto data)
+        public async Task<bool> handleWithOrderDetails(OrderDto data)
         {
             var productIds = data.OrderDetails.Select(x => x.ProductId);
             var selectedProduct = await _dbContext.Products.Where(x => productIds.Contains(x.Id)).ToListAsync();
@@ -35,7 +35,9 @@ namespace E_commerce_app.Services
             order.TotalPrice = orderDetails.Sum(x => x.Price);
             order.Status = GetEnumStatusDescription.GetEnumDescription(TypeStatus.Pending);
             order.OrderProducts = orderDetails;
-            return order;
+            var isCreated = await _dbContext.AddAsync(order);
+
+            return await _dbContext.SaveChangesAsync() > 0;
 
         }
 
@@ -56,7 +58,7 @@ namespace E_commerce_app.Services
 
         public async Task<bool> UpdateOrder(UpdateOrderDto data)
         {
-            var order = await _dbContext.Orders.Include(x => x.OrderProducts).AsNoTracking().FirstOrDefaultAsync();
+            var order = await _dbContext.Orders.Where(x=>x.Id == data.OrderId).Include(x => x.OrderProducts).FirstOrDefaultAsync();
             var orderDetail = order.OrderProducts;
             order.Status = data.Status;
 
@@ -74,6 +76,7 @@ namespace E_commerce_app.Services
                 updateProductStock.Stock = updateProductStock.Stock - diff;
 
                 productItem.Quantity = item.Quantity;
+                productItem.Price = item.Quantity * updateProductStock.Price;
 
 
             }

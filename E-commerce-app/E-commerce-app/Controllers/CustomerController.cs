@@ -1,5 +1,7 @@
 ﻿using E_commerce_app.DTOs;
+using E_commerce_app.Entities;
 using E_commerce_app.Extensions;
+using E_commerce_app.Interface;
 using E_commerce_app.UnitOfWork;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
@@ -9,19 +11,20 @@ namespace E_commerce_app.Controllers
     public class CustomerController : Controller
     {
         private readonly IUnitOfWork _UnitOfWork;
+        private readonly ICustomerRepository _customerRepository;
 
         public CustomerController(IUnitOfWork UnitOfWork)
         {
             _UnitOfWork = UnitOfWork;
         }
-        [HttpPost("Customer/Create")]
+        [HttpPost("/Customer/Create")]
         public async Task<IActionResult> Create([FromBody] CustomerDto data)
         {
             if (!ModelState.IsValid)
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Customer>()
                 {
-                    Date = { },
-                    StatusCode = 400,
+                    Date = new Customer(),
+                    StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = BadRequest(ModelState)
                 });
@@ -30,7 +33,7 @@ namespace E_commerce_app.Controllers
             var isCreated = await _UnitOfWork.Customer.AddAsync(customer);
             if (isCreated)
             {
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Customer>()
                 {
                     Date = customer,
                     StatusCode = (int)HttpStatusCode.OK,
@@ -39,16 +42,16 @@ namespace E_commerce_app.Controllers
                 });
             }
 
-            return Ok(new ApiResponseMessageDto()
+            return Ok(new ApiResponseMessageDto<Customer>()
             {
-                Date = { },
+                Date = new Customer(),
                 StatusCode = (int)HttpStatusCode.BadRequest,
                 IsSuccess = false,
                 Messages = HttpStatusCode.BadRequest.ToString(),
             });
         }
 
-        [HttpGet("Customer")]
+        [HttpGet("/Customer")]
         public async Task<IActionResult> Get()
         {
             try
@@ -56,9 +59,9 @@ namespace E_commerce_app.Controllers
 
                 var data = await _UnitOfWork.Customer.GetAllAsync();
 
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<List<CustomerDto>>()
                 {
-                    Date = data.Select(x => x.MappingCustomerDto()),
+                    Date = data.Select(x => x.MappingCustomerDto()).ToList(),
                     StatusCode = (int)HttpStatusCode.OK,
                     IsSuccess = true,
                     Messages = HttpStatusCode.OK.ToString(),
@@ -66,9 +69,9 @@ namespace E_commerce_app.Controllers
             }
             catch
             {
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<List<CustomerDto>>()
                 {
-                    Date = { },
+                    Date = new List<CustomerDto>(),
                     StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = HttpStatusCode.BadRequest.ToString(),
@@ -86,16 +89,16 @@ namespace E_commerce_app.Controllers
                 var data = await _UnitOfWork.Customer.FindByIdAsync(id);
                 if(data == null)
                 {
-                    return Ok(new ApiResponseMessageDto()
+                    return Ok(new ApiResponseMessageDto<CustomerDto>()
                     {
-                        Date =null,
+                        Date = new CustomerDto(),
                         StatusCode = (int)HttpStatusCode.NotFound,
                         IsSuccess = false,
                         Messages = HttpStatusCode.NotFound.ToString(),
                     });
 
                 }
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<CustomerDto>()
                 {
                     Date = data.MappingCustomerDto(),
                     StatusCode = (int)HttpStatusCode.OK,
@@ -105,9 +108,9 @@ namespace E_commerce_app.Controllers
             }
             catch
             {
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<CustomerDto>()
                 {
-                    Date = { },
+                    Date = new CustomerDto(),
                     StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = HttpStatusCode.BadRequest.ToString(),

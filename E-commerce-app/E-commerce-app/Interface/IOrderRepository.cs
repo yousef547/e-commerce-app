@@ -7,10 +7,10 @@ namespace E_commerce_app.Interface
 {
     public interface IOrderRepository : IRepository<Order>
     {
-        Task<Order> handleWithOrderDetails(OrderDto data);
+        Task<bool> handleWithOrderDetails(OrderDto data);
         Task<bool> ReducesInventory(OrderDto data);
         Task<bool> UpdateOrder(UpdateOrderDto data);
-        Task<Order> GetOrdersById(int id);
+        Task<RetrieveOrderDto> GetOrdersById(int id);
 
 
     }

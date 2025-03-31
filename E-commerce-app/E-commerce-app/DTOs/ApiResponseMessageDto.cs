@@ -1,8 +1,8 @@
 ﻿namespace E_commerce_app.DTOs
 {
-    public class ApiResponseMessageDto
+    public class ApiResponseMessageDto<T>
     {
-        public object Date { get; set; }
+        public T Date { get; set; }
         public int StatusCode { get; set; }
         public bool IsSuccess { get; set; }
         public object Messages { get; set; }

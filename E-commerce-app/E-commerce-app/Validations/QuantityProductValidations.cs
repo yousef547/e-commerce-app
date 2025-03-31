@@ -12,12 +12,14 @@ public class QuantityForProductAttribute : ValidationAttribute
         {
             // Retrieve the ProductId from the validation context
             var productIdProperty = validationContext.ObjectType.GetProperty("ProductId");
+            var idProperty = validationContext.ObjectType.GetProperty("Id");
             if (productIdProperty == null)
             {
                 return new ValidationResult("Unknown product ID.");
             }
 
             var productId = (int)productIdProperty.GetValue(validationContext.ObjectInstance);
+            var id = (int)idProperty.GetValue(validationContext.ObjectInstance);
 
             var context = (DataContext)validationContext.GetService(typeof(DataContext));
             var product = context.Products.Find(productId);
@@ -27,7 +29,14 @@ public class QuantityForProductAttribute : ValidationAttribute
             }
             // Simulate a check against a data source (e.g., database)
             // You can replace this with your actual data source logic
-
+            if(id != null)
+            {
+                var OrderDetail = context.OrderDetails.Find(id);
+                if(OrderDetail.Quantity > quantity)
+                {
+                    return ValidationResult.Success;
+                }
+            }
             if (quantity > product.Stock)
             {
                 return new ValidationResult($"Quantity for product {product.Name} is invalid.");

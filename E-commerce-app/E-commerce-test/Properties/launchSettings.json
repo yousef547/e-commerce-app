@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "E-commerce-test": {
+      "commandName": "Project"
+    },
+    "Profile 1": {
+      "commandName": "Executable"
+    }
+  }
+}

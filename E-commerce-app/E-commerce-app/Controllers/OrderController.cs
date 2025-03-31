@@ -20,36 +20,39 @@ namespace E_commerce_app.Controllers
             _UnitOfWork = UnitOfWork;
             _OrderRepository = orderRepository;
         }
-        [HttpPost("Order/Create")]
+        public OrderController(IOrderRepository orderRepository)
+        {
+            _OrderRepository = orderRepository;
+        }
+        [HttpPost("/Order/Create")]
         public async Task<IActionResult> Create([FromBody] OrderDto data)
         {
             if (!ModelState.IsValid)
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Order>()
                 {
-                    Date = { },
-                    StatusCode = 400,
+                    Date = new Order(),
+                    StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = BadRequest(ModelState)
                 });
 
-            var order = await _OrderRepository.handleWithOrderDetails(data);
+            var orderIsCreated = await _OrderRepository.handleWithOrderDetails(data);
 
-            var isCreated = await _UnitOfWork.Order.AddAsync(order);
-            if (isCreated)
+            if (orderIsCreated)
             {
                 var res = await _OrderRepository.ReducesInventory(data);
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Order>()
                 {
-                    Date = null,
+                    Date = new Order(),
                     StatusCode = (int)HttpStatusCode.OK,
                     IsSuccess = true,
                     Messages = HttpStatusCode.OK.ToString(),
                 });
             }
 
-            return Ok(new ApiResponseMessageDto()
+            return Ok(new ApiResponseMessageDto<Order>()
             {
-                Date = { },
+                Date = new Order(),
                 StatusCode = (int)HttpStatusCode.BadRequest,
                 IsSuccess = false,
                 Messages = HttpStatusCode.BadRequest.ToString(),
@@ -65,9 +68,9 @@ namespace E_commerce_app.Controllers
                 var order = await _OrderRepository.GetOrdersById(id);
                 if (order == null)
                 {
-                    return Ok(new ApiResponseMessageDto()
+                    return Ok(new ApiResponseMessageDto<RetrieveOrderDto>()
                     {
-                        Date = null,
+                        Date = new RetrieveOrderDto(),
                         StatusCode = (int)HttpStatusCode.NotFound,
                         IsSuccess = false,
                         Messages = HttpStatusCode.NotFound.ToString(),
@@ -76,9 +79,9 @@ namespace E_commerce_app.Controllers
                 }
 
 
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<RetrieveOrderDto>()
                 {
-                    Date = order.MappingOrderDto(),
+                    Date = order,
                     StatusCode = (int)HttpStatusCode.OK,
                     IsSuccess = true,
                     Messages = HttpStatusCode.OK.ToString(),
@@ -86,9 +89,9 @@ namespace E_commerce_app.Controllers
             }
             catch
             {
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<RetrieveOrderDto>()
                 {
-                    Date = { },
+                    Date = new RetrieveOrderDto(),
                     StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = HttpStatusCode.BadRequest.ToString(),
@@ -96,14 +99,14 @@ namespace E_commerce_app.Controllers
             }
         }
 
-        [HttpPost("Order/UpdateOrderStatus")]
+        [HttpPut("/Order/UpdateOrderStatus")]
         public async Task<IActionResult> UpdateOrderStatus([FromBody] UpdateOrderDto data)
         {
             if (!ModelState.IsValid)
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Order>()
                 {
-                    Date = { },
-                    StatusCode = 400,
+                    Date = new Order(),
+                    StatusCode = (int)HttpStatusCode.BadRequest,
                     IsSuccess = false,
                     Messages = BadRequest(ModelState)
                 });
@@ -113,18 +116,18 @@ namespace E_commerce_app.Controllers
             var res = await _OrderRepository.UpdateOrder(data);
             if (res)
             {
-                return Ok(new ApiResponseMessageDto()
+                return Ok(new ApiResponseMessageDto<Order>()
                 {
-                    Date = null,
+                    Date = new Order(),
                     StatusCode = (int)HttpStatusCode.OK,
                     IsSuccess = true,
                     Messages = HttpStatusCode.OK.ToString(),
                 });
             }
 
-            return Ok(new ApiResponseMessageDto()
+            return Ok(new ApiResponseMessageDto<Order>()
             {
-                Date = { },
+                Date = new Order(),
                 StatusCode = (int)HttpStatusCode.BadRequest,
                 IsSuccess = false,
                 Messages = HttpStatusCode.BadRequest.ToString(),
