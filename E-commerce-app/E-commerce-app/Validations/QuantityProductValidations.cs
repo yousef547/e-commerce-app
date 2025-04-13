@@ -29,15 +29,15 @@ public class QuantityForProductAttribute : ValidationAttribute
             }
             // Simulate a check against a data source (e.g., database)
             // You can replace this with your actual data source logic
-            if(id != null)
+            if(id != 0)
             {
-                var OrderDetail = context.OrderDetails.Find(id);
+                var OrderDetail = context.OrderItems.Find(id);
                 if(OrderDetail.Quantity > quantity)
                 {
                     return ValidationResult.Success;
                 }
             }
-            if (quantity > product.Stock)
+            if (quantity > product.StockQuantity)
             {
                 return new ValidationResult($"Quantity for product {product.Name} is invalid.");
             }

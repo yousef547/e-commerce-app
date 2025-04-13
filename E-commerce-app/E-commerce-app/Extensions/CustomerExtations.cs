@@ -11,7 +11,8 @@ namespace E_commerce_app.Extensions
             {
                 Name = customer.Name,
                 Phone = customer.Phone,
-                Email = customer.Email
+                Email = customer.Email,
+                Address = customer.Address
             };
         }
 
@@ -21,7 +22,9 @@ namespace E_commerce_app.Extensions
             {
                 Name = customer.Name,
                 Phone = customer.Phone,
-                Email = customer.Email
+                Email = customer.Email,
+                Address = customer.Address
+
             };
         }
     }

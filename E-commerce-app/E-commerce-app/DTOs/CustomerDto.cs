@@ -19,7 +19,12 @@ namespace E_commerce_app.DTOs
         public string Email { get; set; } // Email address
 
         [Phone]
+        [Required]
         [StringLength(15)]
         public string Phone { get; set; } // Phone number
+
+        [Required]
+        public string Address { get; set; } // Address number
+
     }
 }

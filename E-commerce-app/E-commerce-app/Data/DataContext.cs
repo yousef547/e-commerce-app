@@ -16,7 +16,8 @@ namespace E_commerce_app.Data
         public virtual DbSet<Product> Products { get; set; } = null!;
         public virtual DbSet<Customer> Customers { get; set; } = null!;
         public virtual DbSet<Order> Orders { get; set; } = null!;
-        public virtual DbSet<OrderProduct> OrderDetails { get; set; } = null!;
+        public virtual DbSet<OrderItem> OrderItems { get; set; } = null!;
+        public virtual DbSet<OrderStatus> OrderStatus { get; set; } = null!;
 
 
 

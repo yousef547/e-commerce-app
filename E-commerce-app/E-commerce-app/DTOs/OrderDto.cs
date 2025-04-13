@@ -30,7 +30,7 @@ namespace E_commerce_app.DTOs
         public int ProductId { get; set; }
         public int Quantity { get; set; }
         public string ProductName { get; set; }
-        public double Price { get; set; }
+        public double Subtotal { get; set; }
 
     }
 
@@ -40,14 +40,14 @@ namespace E_commerce_app.DTOs
         public int OrderId { get; set; }
         [StatusValidations]
         public string Status { get; set; }
-        public List<OrderDetailDto> OrderDetails { get; set; }
+        //public List<OrderDetailDto> OrderDetails { get; set; }
 
     }
 
     public class RetrieveOrderDto
     {
         public int Id { get; set; }
-        public string CutomerName { get; set; }
+        public CustomerDto CutomerDetails { get; set; }
         public string Status { get; set; }
         public List<RetrieveOrderDetailDto> products { get; set; }
 

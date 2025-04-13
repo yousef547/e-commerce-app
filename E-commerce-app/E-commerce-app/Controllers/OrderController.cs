@@ -20,10 +20,7 @@ namespace E_commerce_app.Controllers
             _UnitOfWork = UnitOfWork;
             _OrderRepository = orderRepository;
         }
-        public OrderController(IOrderRepository orderRepository)
-        {
-            _OrderRepository = orderRepository;
-        }
+    
         [HttpPost("/Order/Create")]
         public async Task<IActionResult> Create([FromBody] OrderDto data)
         {

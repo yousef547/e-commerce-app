@@ -16,5 +16,7 @@ namespace E_commerce_app.Entities
         [Phone]
         [StringLength(15)]
         public string Phone { get; set; } // Phone number
+
+        public string Address { get; set; } // Address number
     }
 }

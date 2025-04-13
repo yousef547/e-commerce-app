@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace E_commerce_app.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20250330170447_CreateDbApp")]
-    partial class CreateDbApp
+    [Migration("20250413010546_AddTbOrderStatus")]
+    partial class AddTbOrderStatus
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -32,6 +32,10 @@ namespace E_commerce_app.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -72,9 +76,6 @@ namespace E_commerce_app.Migrations
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
 
-                    b.Property<double>("TotalPrice")
-                        .HasColumnType("float");
-
                     b.HasKey("Id");
 
                     b.HasIndex("CustomerId");
@@ -82,7 +83,7 @@ namespace E_commerce_app.Migrations
                     b.ToTable("Orders");
                 });
 
-            modelBuilder.Entity("E_commerce_app.Entities.OrderProduct", b =>
+            modelBuilder.Entity("E_commerce_app.Entities.OrderItem", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -93,14 +94,14 @@ namespace E_commerce_app.Migrations
                     b.Property<int>("OrderId")
                         .HasColumnType("int");
 
-                    b.Property<double>("Price")
-                        .HasColumnType("float");
-
                     b.Property<int>("ProductId")
                         .HasColumnType("int");
 
                     b.Property<int>("Quantity")
                         .HasColumnType("int");
+
+                    b.Property<double>("Subtotal")
+                        .HasColumnType("float");
 
                     b.HasKey("Id");
 
@@ -108,7 +109,33 @@ namespace E_commerce_app.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("OrderDetails");
+                    b.ToTable("OrderItems");
+                });
+
+            modelBuilder.Entity("E_commerce_app.Entities.OrderStatus", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("OrderId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<DateTime>("TimeStamp")
+                        .HasColumnType("datetime2");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrderId");
+
+                    b.ToTable("OrderStatus");
                 });
 
             modelBuilder.Entity("E_commerce_app.Entities.Product", b =>
@@ -132,7 +159,7 @@ namespace E_commerce_app.Migrations
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
-                    b.Property<int>("Stock")
+                    b.Property<int>("StockQuantity")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -151,7 +178,7 @@ namespace E_commerce_app.Migrations
                     b.Navigation("Customer");
                 });
 
-            modelBuilder.Entity("E_commerce_app.Entities.OrderProduct", b =>
+            modelBuilder.Entity("E_commerce_app.Entities.OrderItem", b =>
                 {
                     b.HasOne("E_commerce_app.Entities.Order", "Order")
                         .WithMany("OrderProducts")
@@ -168,6 +195,17 @@ namespace E_commerce_app.Migrations
                     b.Navigation("Order");
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("E_commerce_app.Entities.OrderStatus", b =>
+                {
+                    b.HasOne("E_commerce_app.Entities.Order", "Order")
+                        .WithMany()
+                        .HasForeignKey("OrderId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Order");
                 });
 
             modelBuilder.Entity("E_commerce_app.Entities.Order", b =>

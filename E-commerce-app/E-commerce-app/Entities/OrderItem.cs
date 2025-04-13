@@ -2,7 +2,7 @@
 
 namespace E_commerce_app.Entities
 {
-    public class OrderProduct : BaseEntity
+    public class OrderItem : BaseEntity
     {
         [Required]
         public int OrderId { get; set; }
@@ -10,7 +10,7 @@ namespace E_commerce_app.Entities
         [Required]
         public int ProductId { get; set; }
         public Product Product { get; set; }
-        public double Price { get; set; }
+        public double Subtotal { get; set; }
         [Required]
         public int Quantity { get; set; }
     }

@@ -5,7 +5,6 @@ namespace E_commerce_app.Entities
 {
     public class Order : BaseEntity
     {
-        public int Id { get; set; }
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }
@@ -15,10 +14,10 @@ namespace E_commerce_app.Entities
 
         [Required]
         [MaxLength(20)]
-        public string Status { get; set; } // "Pending" or "Delivered"
+        public string Status { get; set; } 
 
-        public double TotalPrice { get; set; }
-        public ICollection<OrderProduct> OrderProducts { get; set; }
+        public ICollection<OrderItem> OrderProducts { get; set; }
+        public ICollection<OrderStatus> OrderStatus { get; set; }
 
     }
 }

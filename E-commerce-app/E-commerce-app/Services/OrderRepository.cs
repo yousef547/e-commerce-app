@@ -28,15 +28,14 @@ namespace E_commerce_app.Services
         {
             var productIds = data.OrderDetails.Select(x => x.ProductId);
             var selectedProduct = await _dbContext.Products.Where(x => productIds.Contains(x.Id)).ToListAsync();
-            List<OrderProduct> orderDetails = selectedProduct.Select(x => x.MappingOrder(data)).ToList();
+            List<OrderItem> orderDetails = selectedProduct.Select(x => x.MappingOrder(data)).ToList();
             Order order = new Order();
             order.CustomerId = data.CutomerId;
             order.OrderDate = DateTime.UtcNow;
-            order.TotalPrice = orderDetails.Sum(x => x.Price);
             order.Status = GetEnumStatusDescription.GetEnumDescription(TypeStatus.Pending);
+            order.OrderStatus = CreateOrderStatus(order);
             order.OrderProducts = orderDetails;
             var isCreated = await _dbContext.AddAsync(order);
-
             return await _dbContext.SaveChangesAsync() > 0;
 
         }
@@ -48,7 +47,7 @@ namespace E_commerce_app.Services
             foreach (var item in data.OrderDetails)
             {
                 var updateProduct = selectedProduct.Where(x => x.Id == item.ProductId).FirstOrDefault();
-                updateProduct.Stock = updateProduct.Stock - item.Quantity;
+                updateProduct.StockQuantity = updateProduct.StockQuantity - item.Quantity;
             }
             _dbContext.UpdateRange(selectedProduct);
             var res = await _dbContext.SaveChangesAsync();
@@ -58,35 +57,24 @@ namespace E_commerce_app.Services
 
         public async Task<bool> UpdateOrder(UpdateOrderDto data)
         {
-            var order = await _dbContext.Orders.Where(x=>x.Id == data.OrderId).Include(x => x.OrderProducts).FirstOrDefaultAsync();
-            var orderDetail = order.OrderProducts;
+            var order = await _dbContext.Orders.Where(x=>x.Id == data.OrderId).FirstOrDefaultAsync();
             order.Status = data.Status;
-
-
-            var productIds = data.OrderDetails.Select(x => x.ProductId);
-            var products = await _dbContext.Products.Where(x => productIds.Contains(x.Id)).ToListAsync();
-
-            foreach (var item in data.OrderDetails)
-            {
-
-                var productItem = orderDetail.Where(x => x.Id == item.Id).FirstOrDefault();
-                
-                var diff = item.Quantity - productItem.Quantity;
-                var updateProductStock = products.Where(x => x.Id == item.ProductId).FirstOrDefault();
-                updateProductStock.Stock = updateProductStock.Stock - diff;
-
-                productItem.Quantity = item.Quantity;
-                productItem.Price = item.Quantity * updateProductStock.Price;
-
-
-            }
+            order.OrderStatus = CreateOrderStatus(order);
             _dbContext.Update(order);
-            var res = _dbContext.SaveChanges() > 0;
-
-            if(res)
-                _dbContext.UpdateRange(products);
-
             return _dbContext.SaveChanges() > 0;
+        }
+
+        private List<OrderStatus> CreateOrderStatus(Order order)
+        {
+
+            var orderStatus = new List<OrderStatus>();
+            orderStatus.Add(new OrderStatus
+            {
+                OrderId = order.Id,
+                Status = order.Status,
+                TimeStamp = DateTime.Now,
+            });
+            return orderStatus;
         }
     }
 }

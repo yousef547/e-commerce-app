@@ -17,8 +17,8 @@ namespace E_commerce_app.Entities
 
         [Required]
         [Range(0, int.MaxValue, ErrorMessage = "Stock cannot be negative.")]
-        public int Stock { get; set; } // Available stock
-        public ICollection<OrderProduct> OrderProducts { get; set; }
+        public int StockQuantity { get; set; } // Available stock
+        public ICollection<OrderItem> OrderProducts { get; set; }
 
 
     }
