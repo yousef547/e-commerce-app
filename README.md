@@ -10,7 +10,6 @@ An eCommerce API built with .NET Core 9 that provides functionalities for produc
 3. [Usage](#usage)
 4. [Features](#features)
 5. [Contributing](#contributing)
-6. [License](#license)
 
 ## Installation
 
